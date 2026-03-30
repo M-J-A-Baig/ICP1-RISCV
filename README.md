@@ -1,2 +1,5 @@
 # ICP1-RISCV
-risc v with branch prediction
+
+## 1.The proposed timeline of the project
+
+![1762873081647](pictures/Online Gantt 20260330.png)
