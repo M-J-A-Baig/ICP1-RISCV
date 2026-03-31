@@ -2,4 +2,4 @@
 
 ## 1.The proposed timeline of the project
 
-![1762873081647](pictures/Online Gantt 20260330.png)
+![1762873081647](images/Gantt.png)
