@@ -1,0 +1,42 @@
+name: sv_CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  sv-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # ---------------------------
+      # Install tools
+      # ---------------------------
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator iverilog
+
+      # ---------------------------
+      # Lint with Verilator
+      # ---------------------------
+      - name: Lint SystemVerilog
+        run: |
+          verilator --lint-only -Wall src/design/*.sv
+
+      # ---------------------------
+      # Compile with Icarus Verilog
+      # ---------------------------
+      - name: Compile testbench
+        run: |
+          iverilog -g2012 -o sim.out src/design/*.sv src/simulation/testbench.sv
+
+      # ---------------------------
+      # Run simulation
+      # ---------------------------
+      - name: Run simulation
+        run: |
+          vvp sim.out

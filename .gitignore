@@ -1,0 +1,44 @@
+# Verilator output
+obj_dir/
+*.vcd
+*.log
+
+# Simulation outputs
+*.out
+*.dump
+*.wlf
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.exe
+
+# Temp files
+*.swp
+*.tmp
+*.bak
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Xilinx / FPGA 
+*.jou
+*.str
+*.xpr
+*.runs/
+*.cache/
+*.hw/
+*.ip_user_files/
+
+# Quartus 
+db/
+incremental_db/
+*.qpf
+*.qsf
+*.qws
