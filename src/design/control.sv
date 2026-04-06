@@ -1,7 +1,6 @@
 `timescale 1ns / 1ps
 
-//import common::*;
-`include "common.sv"
+import common::*;
 
 module control(
     input clk,
