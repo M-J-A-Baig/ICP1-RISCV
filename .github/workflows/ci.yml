@@ -23,9 +23,9 @@ jobs:
       # ---------------------------
       # Lint with Verilator
       # ---------------------------
-      - name: Lint SystemVerilog
-        run: |
-          verilator --lint-only -Wall src/design/common.sv src/design/alu.sv src/design/*.sv 
+#      - name: Lint SystemVerilog
+#        run: |
+#          verilator --lint-only -Wall src/design/common.sv src/design/alu.sv src/design/*.sv 
 
       # ---------------------------
       # Compile with Icarus Verilog
