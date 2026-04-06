@@ -1,4 +1,4 @@
-package common;
+//package common;
 
     typedef enum logic [2:0] 
     {
@@ -89,4 +89,4 @@ package common;
         endcase 
     endfunction
     
-endpackage
+//endpackage
