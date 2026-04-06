@@ -1,6 +1,4 @@
-//package common;
-`ifndef COMMON_SV
-`define COMMON_SV
+package common;
 
     typedef enum logic [2:0] 
     {
@@ -91,5 +89,5 @@
         endcase 
     endfunction
 
-`endif
-//endpackage
+
+endpackage
