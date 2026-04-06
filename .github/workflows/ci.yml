@@ -11,6 +11,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y verilator
+
+      - name: Debug
+        run: |
+          echo "=== common.sv ==="
+          cat src/design/common.sv
+          echo "=== cpu.sv ==="
+          cat src/design/cpu.sv
           
       - name: Check verilator version
         run: verilator --version
