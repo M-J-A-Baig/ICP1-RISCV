@@ -32,7 +32,7 @@ jobs:
       # ---------------------------
       - name: Compile testbench
         run: |
-          verilator --cc --exe --build src/design/*.sv src/simulation/testbench.sv
+          iverilog -g2012 -o sim.out src/design/*.sv src/simulation/testbench.sv
 
       # ---------------------------
       # Run simulation
