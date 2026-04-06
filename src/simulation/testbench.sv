@@ -14,6 +14,8 @@ module testbench();
 
     initial begin
         #35 reset_n = 1;
+        #100000; // run for 10000ns then stop 
+        $finish;
     end
     
     
