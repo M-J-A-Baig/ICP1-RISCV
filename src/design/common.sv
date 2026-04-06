@@ -1,4 +1,6 @@
 //package common;
+`ifndef COMMON_SV
+`define COMMON_SV
 
     typedef enum logic [2:0] 
     {
@@ -88,5 +90,6 @@
             default: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rs2} };
         endcase 
     endfunction
-    
+
+`endif
 //endpackage
