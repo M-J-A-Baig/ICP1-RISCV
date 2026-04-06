@@ -32,7 +32,7 @@ jobs:
       # ---------------------------
       - name: Compile testbench
         run: |
-          iverilog -g2012 -I src/design -o sim.out  src/design/common.sv src/design/cpu.sv src/simulation/testbench.sv
+         iverilog -g2012 -o sim.out src/design/cpu.sv src/simulation/testbench.sv
 
       # ---------------------------
       # Run simulation
