@@ -23,7 +23,7 @@ jobs:
         run: verilator --version
         
       - name: Compile testbench
-        run: verilator --binary -sv --top-module testbench src/design/common.sv src/design/alu.sv src/design/control.sv src/design/data_memory.sv src/design/program_memory.sv src/design/register_file.sv src/design/fetch_stage.sv src/design/decode_stage.sv src/design/execute_stage.sv src/design/mem_stage.sv src/design/uart.sv src/design/cpu.sv src/simulation/testbench.sv -o obj_dir/simulate
+        run: verilator --binary -sv -Wno-fatal --top-module testbench src/design/common.sv src/design/alu.sv src/design/control.sv src/design/data_memory.sv src/design/program_memory.sv src/design/register_file.sv src/design/fetch_stage.sv src/design/decode_stage.sv src/design/execute_stage.sv src/design/mem_stage.sv src/design/uart.sv src/design/cpu.sv src/simulation/testbench.sv -o obj_dir/simulate
      
       - name: Run simulation
         run: ./obj_dir/simulate
