@@ -32,4 +32,4 @@ jobs:
           ls -la obj_dir/
 
       - name: Run simulation
-        run: ./obj_dir/simulate
+        run: cd src/design && ../../obj_dir/simulate
