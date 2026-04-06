@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 
-import common::*;
+`include "../design/common.sv"
+//import common::*;
 
 
 module execute_stage(
