@@ -1,13 +1,11 @@
 name: sv_CI
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
+
 jobs:
   sv-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Install tools
         run: |
