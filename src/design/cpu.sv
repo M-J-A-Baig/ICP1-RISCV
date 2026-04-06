@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-`include "../design/common.sv"
+`include "common.sv"
 //import common::*;
 
 
