@@ -32,7 +32,11 @@ jobs:
       # ---------------------------
       - name: Compile testbench
         run: |
-         verilator --binary -I src/design --top-module testbench src/design/*.sv src/simulation/testbench.sv
+         verilator --binary -sv \
+          -I src/design \
+          --top-module testbench \
+          $(find src/design -name "*.sv") \
+          src/simulation/testbench.sv
 
  #                  iverilog -g2012 -I src/design -s cpu -o sim.out src/design/*.sv src/simulation/testbench.sv
 
