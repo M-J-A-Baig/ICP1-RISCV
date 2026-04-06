@@ -1,13 +1,17 @@
-//package common;
-`ifndef COMMON_SV
-`define COMMON_SV
+package common;
 
-    typedef enum logic [2:0] 
+    typedef enum logic [3:0] 
     {
-        ALU_AND = 3'b000,
-        ALU_OR = 3'b001,
-        ALU_ADD = 3'b010,
-        ALU_SUB = 3'b011
+        ALU_AND = 4'b0000,
+        ALU_OR = 4'b0001,
+        ALU_ADD = 4'b0010,
+        ALU_SUB = 4'b0011,
+        ALU_SLL = 4'b0100, //4
+        ALU_SRL = 4'b0101, //5
+        ALU_LUI = 4'b0111, //7
+        ALU_XOR = 4'b1001, //9
+        //ALU_AND = 4'b1011, //11
+        ALU_SLT = 4'b1010 //10
     } alu_op_type;
     
     
@@ -32,6 +36,10 @@
         logic reg_write;
         logic mem_to_reg;
         logic is_branch;
+        logic is_jump;
+        logic [2:0] branch_type;
+        logic [1:0] mem_type;     //00: Byte, 01: Halfword, 10: Word
+        logic extend_type;     //0:Unsigned
     } control_type;
     
     
@@ -55,6 +63,7 @@
     
     typedef struct packed
     {
+        logic [31:0] pc;
         logic [5:0] reg_rd_id;
         logic [31:0] data1;
         logic [31:0] data2;
@@ -65,6 +74,7 @@
 
     typedef struct packed
     {
+        logic [31:0] pc;
         logic [5:0] reg_rd_id;
         control_type control;
         logic [31:0] alu_data;
@@ -74,6 +84,7 @@
     
     typedef struct packed
     {
+        logic [31:0] pc;
         logic [5:0] reg_rd_id;
         logic [31:0] memory_data;
         logic [31:0] alu_data;
@@ -87,9 +98,9 @@
             S_TYPE: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rd} };
             B_TYPE: immediate_extension = 
                 { {20{instruction.funct7[6]}}, {instruction.funct7[6], instruction.rd[0], instruction.funct7[5:0], instruction.rd[4:1]} };
+            U_TYPE: immediate_extension = {instruction.funct7, instruction.rs2, instruction.rs1, instruction.funct3, 12'b0};
             default: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rs2} };
         endcase 
     endfunction
-
-`endif
-//endpackage
+    
+endpackage

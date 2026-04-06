@@ -5,7 +5,9 @@ module fetch_stage(
     input clk,
     input reset_n,
     output logic [31:0] address,
-    input [31:0] data
+    input [31:0] data,
+    input jump_en,
+    input [31:0] jump_target
 );
 
     logic [31:0] pc_next, pc_reg;
@@ -21,10 +23,16 @@ module fetch_stage(
     end
         
         
+    //always_comb begin
+    //    pc_next = pc_reg + 4;      
+    //end
     always_comb begin
-        pc_next = pc_reg + 4;      
+    if (jump_en) begin
+        pc_next = jump_target;
+    end else begin
+        pc_next = pc_reg + 4;
     end
-    
+end
     
     assign address = pc_reg;
     

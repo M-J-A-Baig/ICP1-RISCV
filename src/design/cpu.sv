@@ -1,7 +1,6 @@
 `timescale 1ns / 1ps
 
-`include "common.sv"
-//import common::*;
+import common::*;
 
 
 module cpu(
@@ -23,6 +22,7 @@ module cpu(
     logic [31:0] execute_alu_data;
     control_type execute_control;
     logic [31:0] execute_memory_data;
+    logic [31:0] execute_jump_target;//
     
     logic [31:0] memory_memory_data;
     logic [31:0] memory_alu_data;
@@ -49,17 +49,20 @@ module cpu(
             if_id_reg.pc <= program_mem_address;
             if_id_reg.instruction <= program_mem_read_data;
             
+            id_ex_reg.pc <= if_id_reg.pc;
             id_ex_reg.reg_rd_id <= decode_reg_rd_id;
             id_ex_reg.data1 <= decode_data1;
             id_ex_reg.data2 <= decode_data2;
             id_ex_reg.immediate_data <= decode_immediate_data;
             id_ex_reg.control <= decode_control;
             
+            ex_mem_reg.pc <= id_ex_reg.pc;
             ex_mem_reg.reg_rd_id <= id_ex_reg.reg_rd_id;
             ex_mem_reg.control <= execute_control;
             ex_mem_reg.alu_data <= execute_alu_data;
             ex_mem_reg.memory_data <= execute_memory_data;
             
+            mem_wb_reg.pc <= ex_mem_reg.pc;
             mem_wb_reg.reg_rd_id <= ex_mem_reg.reg_rd_id;
             mem_wb_reg.memory_data <= memory_memory_data;
             mem_wb_reg.alu_data <= memory_alu_data;
@@ -81,7 +84,12 @@ module cpu(
         .clk(clk), 
         .reset_n(reset_n),
         .address(program_mem_address),
-        .data(program_mem_read_data)
+        .data(program_mem_read_data),
+        .jump_en(execute_control.is_jump),
+        .jump_target(execute_jump_target)
+        
+        //.jump_en(ex_mem_reg.control.is_jump),
+        //.jump_target(ex_mem_reg.alu_data)        
     );
     
     
@@ -104,13 +112,15 @@ module cpu(
     execute_stage inst_execute_stage(
         .clk(clk), 
         .reset_n(reset_n),
+        .pc(id_ex_reg.pc),
         .data1(id_ex_reg.data1),
         .data2(id_ex_reg.data2),
         .immediate_data(id_ex_reg.immediate_data),
         .control_in(id_ex_reg.control),
         .control_out(execute_control),
         .alu_data(execute_alu_data),
-        .memory_data(execute_memory_data)          
+        .memory_data(execute_memory_data),
+        .jump_target(execute_jump_target)          
     );
     
     
@@ -128,6 +138,6 @@ module cpu(
 
     assign wb_reg_rd_id = mem_wb_reg.reg_rd_id;
     assign wb_write_back_en = mem_wb_reg.control.reg_write;
-    assign wb_result = mem_wb_reg.control.mem_read ? mem_wb_reg.memory_data : mem_wb_reg.alu_data;
-    
+    //assign wb_result = mem_wb_reg.control.mem_read ? mem_wb_reg.memory_data : mem_wb_reg.alu_data;
+    assign wb_result = mem_wb_reg.control.is_jump ? (mem_wb_reg.pc + 4) : (mem_wb_reg.control.mem_read ? mem_wb_reg.memory_data : mem_wb_reg.alu_data);
 endmodule
