@@ -13,10 +13,14 @@ module cpu(
     logic [31:0] program_mem_write_data = 0; 
     logic [31:0] program_mem_read_data;
     
+    logic branch_taken;
+    logic [31:0] branch_target;
+    
     logic [5:0] decode_reg_rd_id;
     logic [31:0] decode_data1;
     logic [31:0] decode_data2;
     logic [31:0] decode_immediate_data;
+    logic [31:0] decode_branch_target;
     control_type decode_control;
     
     logic [31:0] execute_alu_data;
@@ -36,6 +40,7 @@ module cpu(
     ex_mem_type ex_mem_reg;
     mem_wb_type mem_wb_reg;
     
+   localparam logic [9:0] LB_INSTRUCTION = {3'b000, 7'b0000011};
    
     always_ff @(posedge clk) begin
         if (!reset_n) begin
@@ -43,10 +48,13 @@ module cpu(
             id_ex_reg <= '0;
             ex_mem_reg <= '0;
             mem_wb_reg <= '0;
+            branch_target <= '0;
         end
         else begin
             if_id_reg.pc <= program_mem_address;
             if_id_reg.instruction <= program_mem_read_data;
+            
+            branch_target <= decode_branch_target;
             
             id_ex_reg.reg_rd_id <= decode_reg_rd_id;
             id_ex_reg.data1 <= decode_data1;
@@ -80,7 +88,9 @@ module cpu(
         .clk(clk), 
         .reset_n(reset_n),
         .address(program_mem_address),
-        .data(program_mem_read_data)
+        .data(program_mem_read_data),
+        .branch_target(branch_target),
+        .branch_taken(branch_taken)
     );
     
     
@@ -96,6 +106,7 @@ module cpu(
         .read_data1(decode_data1),
         .read_data2(decode_data2),
         .immediate_data(decode_immediate_data),
+        .branch_target(decode_branch_target),
         .control_signals(decode_control)
     );
     
@@ -128,5 +139,6 @@ module cpu(
     assign wb_reg_rd_id = mem_wb_reg.reg_rd_id;
     assign wb_write_back_en = mem_wb_reg.control.reg_write;
     assign wb_result = mem_wb_reg.control.mem_read ? mem_wb_reg.memory_data : mem_wb_reg.alu_data;
-    
+    assign branch_taken = id_ex_reg.control.is_branch ? execute_alu_data[0] : 0;
+
 endmodule

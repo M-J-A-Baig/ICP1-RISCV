@@ -5,7 +5,11 @@ package common;
         ALU_AND = 3'b000,
         ALU_OR = 3'b001,
         ALU_ADD = 3'b010,
-        ALU_SUB = 3'b011
+        ALU_SUB = 3'b011,
+        ALU_SLL = 3'b100,
+        ALU_SRA = 3'b101,
+        ALU_BGEU = 3'b110,
+        ALU_SLTU = 3'b111
     } alu_op_type;
     
     
@@ -30,6 +34,7 @@ package common;
         logic reg_write;
         logic mem_to_reg;
         logic is_branch;
+        logic [2:0] funct3; //
     } control_type;
     
     
@@ -84,10 +89,10 @@ package common;
             I_TYPE: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rs2} };
             S_TYPE: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rd} };
             B_TYPE: immediate_extension = 
-                { {20{instruction.funct7[6]}}, {instruction.funct7[6], instruction.rd[0], instruction.funct7[5:0], instruction.rd[4:1]} };
+                { {20{instruction.funct7[6]}}, {instruction.rd[0], instruction.funct7[5:0], instruction.rd[4:1], 1'b0} };
+            U_TYPE: immediate_extension = { instruction.funct7, instruction.rs2, instruction.rs1, instruction.funct3, 12'b0000_0000_0000 };
             default: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rs2} };
         endcase 
     endfunction
-
-
+    
 endpackage

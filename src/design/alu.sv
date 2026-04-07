@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 import common::*;
-//`include "common.sv"
+
 
 module alu(
     input wire [2:0] control,
@@ -17,6 +17,10 @@ module alu(
             ALU_OR: result = left_operand | right_operand;
             ALU_ADD: result = left_operand + right_operand;
             ALU_SUB: result = left_operand - right_operand;
+            ALU_SLL: result = left_operand << right_operand[4:0];
+            ALU_SRA: result = $signed(left_operand) >>> right_operand[4:0];
+            ALU_SLTU: result = (left_operand < right_operand) ? 32'b1 : 32'b0;
+            ALU_BGEU: result = (left_operand >= right_operand) ? 32'b1 : 32'b0;
             default: result = left_operand + right_operand;
         endcase
     end
