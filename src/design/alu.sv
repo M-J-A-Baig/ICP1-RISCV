@@ -24,7 +24,7 @@ module alu(
             ALU_XOR : result = left_operand ^ right_operand;
             ALU_ORI : result = left_operand | right_operand;
             ALU_SLT : result = ($signed(left_operand) < $signed(right_operand)) ? 32'd1 : 32'd0;
-            ALU_SLTIU: result = (left_operand < {32{right_operand}) ? 32'd1 : 32'd0;
+            ALU_SLTIU: result = (left_operand < right_operand) ? 32'd1 : 32'd0;
 
 
 
