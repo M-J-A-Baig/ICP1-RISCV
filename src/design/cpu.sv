@@ -67,7 +67,7 @@ module cpu(
     end
 
 
-    program_memory inst_mem(
+    program_memory inst_mem(              // load memory
         .clk(clk),        
         .byte_address(program_mem_address),
         .write_enable(program_mem_write_enable),
@@ -76,18 +76,18 @@ module cpu(
     );
     
     
-    fetch_stage inst_fetch_stage(
+    fetch_stage inst_fetch_stage(                  //simple program counter
         .clk(clk), 
         .reset_n(reset_n),
         .address(program_mem_address),
-        .data(program_mem_read_data)
+        .data(program_mem_read_data)     
     );
     
     
-    decode_stage inst_decode_stage(
+    decode_stage inst_decode_stage(              
         .clk(clk), 
         .reset_n(reset_n),    
-        .instruction(if_id_reg.instruction),
+        .instruction(if_id_reg.instruction),      // command from instruction memory
         .pc(if_id_reg.pc),
         .write_en(wb_write_back_en),
         .write_id(wb_reg_rd_id),        

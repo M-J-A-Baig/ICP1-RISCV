@@ -1,0 +1,5 @@
+added command names and binary values in common.sv
+chceck logics in control- specially beq
+adding RV32I Base Instruction Set into control.sv from unpriviliged pg 604  as local param
+added commands in alu.sv
+

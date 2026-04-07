@@ -15,6 +15,63 @@ module control(
     localparam logic [9:0] LW_INSTRUCTION = {3'b010, 7'b0000011};
     localparam logic [9:0] SW_INSTRUCTION = {3'b010, 7'b0100011};
     localparam logic [9:0] BEQ_INSTRUCTION = {3'b000, 7'b1100011};
+
+    // // green commands - grade 3
+    // localparam logic [16:0] SLL_INSTRUCTION     = {7'b0000000, 3'b001, 7'b0110011};
+    // localparam logic [9:0] SLLI_INSTRUCTION     = {3'b001, 7'b0010011};
+    // //     ALU_SRL       = 6'b000110,
+    // localparam logic [9:0] SRLI_INSTRUCTION     = {3'b101, 7'b0010011};
+    // localparam logic [16:0] SRA_INSTRUCTION     = {7'b0100000, 3'b101, 7'b0110011};
+    // localparam logic [9:0] SRAI_INSTRUCTION     = {3'b101, 7'b0010011}; // note funct7 needed at runtime
+    // localparam logic [9:0] LUI_INSTRUCTION      = {3'b000, 7'b0110111};
+    // localparam logic [9:0] AUIPC_INSTRUCTION    = {3'b000, 7'b0010111};
+    // localparam logic [16:0] AND_INSTRUCTION     = {7'b0000000, 3'b111, 7'b0110011};
+    // localparam logic [9:0] ANDI_INSTRUCTION     = {3'b111, 7'b0010011};
+    // localparam logic [16:0] XOR_INSTRUCTION     = {7'b0000000, 3'b100, 7'b0110011};
+    // localparam logic [9:0] XORI_INSTRUCTION     = {3'b100, 7'b0010011};
+    // localparam logic [16:0] OR_INSTRUCTION      = {7'b0000000, 3'b110, 7'b0110011};
+    // localparam logic [9:0] ORI_INSTRUCTION      = {3'b110, 7'b0010011};
+    // localparam logic [16:0] SLT_INSTRUCTION     = {7'b0000000, 3'b010, 7'b0110011};
+    // localparam logic [9:0] SLTI_INSTRUCTION     = {3'b010, 7'b0010011};
+    // localparam logic [16:0] SLTU_INSTRUCTION    = {7'b0000000, 3'b011, 7'b0110011};
+    // localparam logic [9:0] SLTIU_INSTRUCTION    = {3'b011, 7'b0010011};
+    // localparam logic [9:0] BNE_INSTRUCTION      = {3'b001, 7'b1100011};
+    // localparam logic [9:0] BLT_INSTRUCTION      = {3'b100, 7'b1100011};
+    // localparam logic [9:0] BGE_INSTRUCTION      = {3'b101, 7'b1100011};
+    // localparam logic [9:0] BLTU_INSTRUCTION     = {3'b110, 7'b1100011};
+    // localparam logic [9:0] BGEU_INSTRUCTION     = {3'b111, 7'b1100011};
+    // localparam logic [9:0] JAL_INSTRUCTION      = {3'b000, 7'b1101111};
+    // localparam logic [9:0] JALR_INSTRUCTION     = {3'b000, 7'b1100111};
+    // localparam logic [9:0] LB_INSTRUCTION       = {3'b000, 7'b0000011};
+    // localparam logic [9:0] LH_INSTRUCTION       = {3'b001, 7'b0000011};
+    // localparam logic [9:0] LBU_INSTRUCTION      = {3'b100, 7'b0000011};
+    // localparam logic [9:0] LHU_INSTRUCTION      = {3'b101, 7'b0000011};
+    // localparam logic [9:0] SB_INSTRUCTION       = {3'b000, 7'b0100011};
+    // localparam logic [9:0] SH_INSTRUCTION       = {3'b001, 7'b0100011};
+    // // orange commands - grade 4
+    // localparam logic [16:0] MUL_INSTRUCTION     = {7'b0000001, 3'b000, 7'b0110011};
+    // localparam logic [16:0] MULH_INSTRUCTION    = {7'b0000001, 3'b001, 7'b0110011};
+    // localparam logic [16:0] MULHU_INSTRUCTION   = {7'b0000001, 3'b011, 7'b0110011};
+    // localparam logic [16:0] MULHSU_INSTRUCTION  = {7'b0000001, 3'b010, 7'b0110011};
+    // localparam logic [16:0] DIV_INSTRUCTION     = {7'b0000001, 3'b100, 7'b0110011};
+    // localparam logic [16:0] DIVU_INSTRUCTION    = {7'b0000001, 3'b101, 7'b0110011};
+    // localparam logic [16:0] REM_INSTRUCTION     = {7'b0000001, 3'b110, 7'b0110011};
+    // localparam logic [16:0] REMU_INSTRUCTION    = {7'b0000001, 3'b111, 7'b0110011};
+    // //grade 5 red commands
+    // localparam logic [16:0] FCVT_S_W_INSTRUCTION   = {7'b1101000, 3'b000, 7'b1010011};
+    // localparam logic [16:0] FCVT_S_WU_INSTRUCTION  = {7'b1101000, 3'b001, 7'b1010011};
+    // localparam logic [16:0] FCVT_W_S_INSTRUCTION   = {7'b1100000, 3'b000, 7'b1010011};
+    // localparam logic [16:0] FCVT_WU_S_INSTRUCTION  = {7'b1100000, 3'b001, 7'b1010011};
+    // localparam logic [16:0] FADD_S_INSTRUCTION     = {7'b0000000, 3'b000, 7'b1010011};
+    // localparam logic [16:0] FSUB_S_INSTRUCTION     = {7'b0000100, 3'b000, 7'b1010011};
+    // localparam logic [16:0] FMUL_S_INSTRUCTION     = {7'b0001000, 3'b000, 7'b1010011};
+    // localparam logic [16:0] FDIV_S_INSTRUCTION     = {7'b0001100, 3'b000, 7'b1010011};
+    // localparam logic [16:0] FSQRT_S_INSTRUCTION    = {7'b0101100, 3'b000, 7'b1010011};
+    // localparam logic [9:0] FLW_INSTRUCTION         = {3'b010, 7'b0000111};
+    // localparam logic [9:0] FSW_INSTRUCTION         = {3'b010, 7'b0100111};
+
+
+
     
     
     always_comb begin
