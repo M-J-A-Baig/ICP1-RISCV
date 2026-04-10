@@ -13,8 +13,16 @@ module testbench();
 
 
     initial begin
+
+        $dumpfile("wave.vcd");
+        $dumpvars(0, testbench);
+
+
         #35 reset_n = 1;
         #100000; // run for 10000ns then stop 
+
+
+       
         $finish;
     end
     

@@ -19,12 +19,12 @@ module alu(
             ALU_SUB: result = left_operand - right_operand;
 
 
-            ALU_SRL :  result = left_operand >> right_operand[4:0]; // shiift only lower 5 bit value
-            ALU_SRAI: result = $signed(left_operand) >>> right_operand[4:0]; // shiift only lower 5 bit value
-            ALU_XOR : result = left_operand ^ right_operand;
-            ALU_ORI : result = left_operand | right_operand;
-            ALU_SLT : result = ($signed(left_operand) < $signed(right_operand)) ? 32'd1 : 32'd0;
-            ALU_SLTIU: result = (left_operand < right_operand) ? 32'd1 : 32'd0;
+            // ALU_SRL :  result = left_operand >> right_operand[4:0]; // shiift only lower 5 bit value
+            // ALU_SRAI: result = $signed(left_operand) >>> right_operand[4:0]; // shiift only lower 5 bit value
+            // ALU_XOR : result = left_operand ^ right_operand;
+            // ALU_ORI : result = left_operand | right_operand;
+            // ALU_SLT : result = ($signed(left_operand) < $signed(right_operand)) ? 32'd1 : 32'd0;
+            // ALU_SLTIU: result = (left_operand < right_operand) ? 32'd1 : 32'd0;
 
 
 

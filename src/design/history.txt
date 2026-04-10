@@ -3,3 +3,14 @@ chceck logics in control- specially beq
 adding RV32I Base Instruction Set into control.sv from unpriviliged pg 604  as local param
 added commands in alu.sv
 
+cd C:/Users/M.J.A.B/Desktop/Github/ICP1/ICP1-RISCV/src/simulation/
+
+C:/msys64/mingw64/bin/verilator -Wall --cc \
+C:/Users/M.J.A.B/Desktop/Github/ICP1/ICP1-RISCV/src/design/*.sv \
+C:/Users/M.J.A.B/Desktop/Github/ICP1/ICP1-RISCV/src/simulation/testbench.sv \
+--trace --build
+
+cd obj_dir
+
+
+make -f Vtestbench.mk
