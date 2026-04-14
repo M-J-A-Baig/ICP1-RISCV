@@ -11,7 +11,8 @@ package common;
         ALU_LUI = 4'b0111, //7
         ALU_XOR = 4'b1001, //9
         //ALU_AND = 4'b1011, //11
-        ALU_SLT = 4'b1010 //10
+        ALU_SLT = 4'b1010, //10
+        ALU_SLTU = 4'b1011
     } alu_op_type;
     
     
@@ -37,9 +38,9 @@ package common;
         logic mem_to_reg;
         logic is_branch;
         logic is_jump;
-        logic [2:0] branch_type;
-        logic [1:0] mem_type;     //00: Byte, 01: Halfword, 10: Word
-        logic extend_type;     //0:Unsigned
+        logic [2:0] funct3; //reuse
+//        logic [1:0] mem_type;     //00: Byte, 01: Halfword, 10: Word
+//        logic extend_type;     //0:Unsigned
     } control_type;
     
     
@@ -65,6 +66,8 @@ package common;
     {
         logic [31:0] pc;
         logic [5:0] reg_rd_id;
+        logic [4:0] rs1;
+        logic [4:0] rs2;
         logic [31:0] data1;
         logic [31:0] data2;
         logic [31:0] immediate_data;
@@ -97,7 +100,7 @@ package common;
             I_TYPE: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rs2} };
             S_TYPE: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rd} };
             B_TYPE: immediate_extension = 
-                { {20{instruction.funct7[6]}}, {instruction.funct7[6], instruction.rd[0], instruction.funct7[5:0], instruction.rd[4:1]} };
+                { {19{instruction.funct7[6]}}, {instruction.funct7[6], instruction.rd[0], instruction.funct7[5:0], instruction.rd[4:1]},1'b0 };
             U_TYPE: immediate_extension = {instruction.funct7, instruction.rs2, instruction.rs1, instruction.funct3, 12'b0};
             default: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rs2} };
         endcase 

@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
-`include "common.sv"
-//import common::*;
+//`include "common.sv"
+import common::*;
 
 
 module decode_stage(

@@ -22,13 +22,21 @@ module register_file(
         if (!reset_n) begin
             registers = '{default:0};
         end 
-        else if (write_en) begin
+        else if (write_en && (write_id != 5'd0)) begin
             registers[write_id] <= write_data;     
-        end
+        end //x0 = 0
     end
 
 
-    assign read1_data = read1_id == 0 ? 0 : registers[read1_id];
-    assign read2_data = read2_id == 0 ? 0 : registers[read2_id];
+//    assign read1_data = read1_id == 0 ? 0 : registers[read1_id];
+//    assign read2_data = read2_id == 0 ? 0 : registers[read2_id];
 
+    // read and write at the same time: write_data forward
+    assign read1_data = (read1_id == 0) ? 32'b0 :
+                        (write_en && (write_id == read1_id)) ? write_data : 
+                        registers[read1_id];
+
+    assign read2_data = (read2_id == 0) ? 32'b0 :
+                        (write_en && (write_id == read2_id)) ? write_data : 
+                        registers[read2_id];
 endmodule

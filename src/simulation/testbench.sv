@@ -16,6 +16,13 @@ module testbench();
         #35 reset_n = 1;
     end
     
+    // 200ns - end
+//    initial begin
+//        #200; 
+        
+//        $display("Simulation Finished!");
+//        $finish; 
+//    end
     
     cpu cpu_inst(
         .clk(clock),

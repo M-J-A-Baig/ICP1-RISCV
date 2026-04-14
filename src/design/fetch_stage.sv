@@ -4,10 +4,11 @@
 module fetch_stage(
     input clk,
     input reset_n,
-    output logic [31:0] address,
     input [31:0] data,
     input jump_en,
-    input [31:0] jump_target
+    input [31:0] jump_target,
+    input stall_control,
+    output logic [31:0] address
 );
 
     logic [31:0] pc_next, pc_reg;
@@ -17,7 +18,7 @@ module fetch_stage(
         if (!reset_n) begin
             pc_reg <= 0;
         end
-        else begin
+        else if (!stall_control) begin
             pc_reg <= pc_next;
         end 
     end

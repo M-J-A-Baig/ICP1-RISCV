@@ -23,6 +23,7 @@ module control(
     localparam logic [16:0] XORI_INSTRUCTION = {3'b100, 7'b0010011};
     localparam logic [16:0] AND_INSTRUCTION = {7'b0000000, 3'b111, 7'b0110011};
     localparam logic [16:0] SLTI_INSTRUCTION = {3'b010, 7'b0010011};
+    localparam logic [16:0] SLTU_INSTRUCTION = {3'b011, 7'b0110011};
     
     localparam logic [16:0] BNE_INSTRUCTION = {3'b001, 7'b1100011};
     localparam logic [16:0] BLTU_INSTRUCTION = {3'b110, 7'b1100011};
@@ -50,11 +51,11 @@ module control(
                 control.mem_read = 1'b1;                
                 control.mem_to_reg = 1'b1;
                 control.alu_op = ALU_ADD;
-                
-                if(instruction.funct3 == 3'b100) begin
-                    control.mem_type = 2'b00;
-                    control.extend_type = 1'b0;
-                end                
+                control.funct3 = instruction.funct3;
+//                if(instruction.funct3 == 3'b100) begin
+//                    control.mem_type = 2'b00;
+//                    control.extend_type = 1'b0;
+//                end                
             end
             
             7'b0010011: begin
@@ -68,23 +69,24 @@ module control(
                 control.alu_src = 1'b1;
                 control.mem_write = 1'b1;
                 control.alu_op = ALU_ADD;
-                
-                if(instruction.funct3 == 3'b001) begin
-                    control.mem_type = 2'b01;
-//                    control.extend_type = 1'b0;
-                end                   
+                control.funct3 = instruction.funct3;
+//                if(instruction.funct3 == 3'b001) begin
+//                    control.mem_type = 2'b01;
+////                    control.extend_type = 1'b0;
+//                end                   
             end
             
             7'b1100011: begin
                 control.encoding = B_TYPE;
                 control.is_branch = 1'b1;
-                control.branch_type = instruction.funct3;             
+                control.funct3 = instruction.funct3;            
             end
             
             7'b1100111: begin
                 control.encoding = I_TYPE;
                 control.is_jump = 1'b1;
-                control.alu_src = 1'b1;            
+                control.alu_src = 1'b1;     
+                control.reg_write = 1'b1;       
             end// JALR
             
             7'b0110111: begin //LUI
@@ -127,6 +129,9 @@ module control(
             control.alu_op = ALU_SUB;
         end 
         else if ({instruction.funct3, instruction.opcode} == BLTU_INSTRUCTION) begin
+            control.alu_op = ALU_SLTU;
+        end
+        else if ({instruction.funct3, instruction.opcode} == SLTU_INSTRUCTION) begin
             control.alu_op = ALU_SLTU;
         end
 //        else if ({instruction.funct3, instruction.opcode} == LBU_INSTRUCTION) begin

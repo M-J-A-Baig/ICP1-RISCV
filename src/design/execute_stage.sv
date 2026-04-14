@@ -10,6 +10,10 @@ module execute_stage(
     input [31:0] data1,
     input [31:0] data2,
     input [31:0] immediate_data,
+    input [1:0]  forward_A, //forward control
+    input [1:0]  forward_B, //forward control
+    input [31:0] forward_data_mem, //forward data
+    input [31:0] forward_data_wb, //forward data
     input control_type control_in,
     output control_type control_out,
     output logic [31:0] alu_data,
@@ -25,15 +29,34 @@ module execute_stage(
     
     logic [31:0] left_operand;
     logic [31:0] right_operand;
-    
-    
+    logic [31:0] forwarded_data2;
+
     always_comb begin: operand_selector
-        left_operand = data1;
-        right_operand = data2;
+        case(forward_A)
+            2'b00: left_operand = data1;              
+            2'b01: left_operand = forward_data_mem;   
+            2'b10: left_operand = forward_data_wb;    
+            default: left_operand = data1;
+        endcase
+        case(forward_B)
+            2'b00: forwarded_data2 = data2;
+            2'b01: forwarded_data2 = forward_data_mem;
+            2'b10: forwarded_data2 = forward_data_wb;
+            default: forwarded_data2 = data2;
+        endcase
+        right_operand = forwarded_data2;
         if (control_in.alu_src) begin
             right_operand = immediate_data;
         end
     end
+        assign memory_data = forwarded_data2;
+//    always_comb begin: operand_selector
+//        left_operand = data1;
+//        right_operand = data2;
+//        if (control_in.alu_src) begin
+//            right_operand = immediate_data;
+//        end
+//    end
     
     
     alu inst_alu(
@@ -44,14 +67,13 @@ module execute_stage(
         .result(alu_data)
     );
      
-    assign memory_data = data2;
     
     always_comb begin
         control_out = control_in;
         jump_target = pc + 4; //default,avoid latches
         
         if (control_in.is_branch) begin
-            case (control_in.branch_type)
+            case (control_in.funct3)
                 3'b000: begin // BEQ
                     if (zero_flag == 1'b1) begin
                         control_out.is_jump = 1'b1;

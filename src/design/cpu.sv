@@ -37,6 +37,9 @@ module cpu(
     ex_mem_type ex_mem_reg;
     mem_wb_type mem_wb_reg;
     
+    logic [1:0] forward_A;
+    logic [1:0] forward_B;//forwarding unit
+    
    
     always_ff @(posedge clk) begin
         if (!reset_n) begin
@@ -46,15 +49,28 @@ module cpu(
             mem_wb_reg <= '0;
         end
         else begin
-            if_id_reg.pc <= program_mem_address;
-            if_id_reg.instruction <= program_mem_read_data;
-            
+            if (!stall_control) begin
+                if_id_reg.pc <= program_mem_address;
+                if (execute_control.is_jump) begin
+                    if_id_reg.instruction <= 32'h00000013;//NOP
+                end else begin
+                    if_id_reg.instruction <= program_mem_read_data;
+                end
+            end
+                   
             id_ex_reg.pc <= if_id_reg.pc;
             id_ex_reg.reg_rd_id <= decode_reg_rd_id;
             id_ex_reg.data1 <= decode_data1;
             id_ex_reg.data2 <= decode_data2;
             id_ex_reg.immediate_data <= decode_immediate_data;
-            id_ex_reg.control <= decode_control;
+            id_ex_reg.rs1 <= if_id_reg.instruction.rs1;
+            id_ex_reg.rs2 <= if_id_reg.instruction.rs2;
+            if (execute_control.is_jump || stall_control) begin
+                id_ex_reg.control <= '0;//NO CONTROL
+            end else begin
+                id_ex_reg.control <= decode_control;
+            end
+            
             
             ex_mem_reg.pc <= id_ex_reg.pc;
             ex_mem_reg.reg_rd_id <= id_ex_reg.reg_rd_id;
@@ -86,8 +102,8 @@ module cpu(
         .address(program_mem_address),
         .data(program_mem_read_data),
         .jump_en(execute_control.is_jump),
-        .jump_target(execute_jump_target)
-        
+        .jump_target(execute_jump_target),
+        .stall_control(stall_control)
         //.jump_en(ex_mem_reg.control.is_jump),
         //.jump_target(ex_mem_reg.alu_data)        
     );
@@ -116,6 +132,10 @@ module cpu(
         .data1(id_ex_reg.data1),
         .data2(id_ex_reg.data2),
         .immediate_data(id_ex_reg.immediate_data),
+        .forward_A(forward_A), // forward control
+        .forward_B(forward_B), // forward control
+        .forward_data_mem(ex_mem_reg.alu_data), // forward_data from EX/MEM
+        .forward_data_wb(wb_result), // forward_data from MEM/WB
         .control_in(id_ex_reg.control),
         .control_out(execute_control),
         .alu_data(execute_alu_data),
@@ -140,4 +160,26 @@ module cpu(
     assign wb_write_back_en = mem_wb_reg.control.reg_write;
     //assign wb_result = mem_wb_reg.control.mem_read ? mem_wb_reg.memory_data : mem_wb_reg.alu_data;
     assign wb_result = mem_wb_reg.control.is_jump ? (mem_wb_reg.pc + 4) : (mem_wb_reg.control.mem_read ? mem_wb_reg.memory_data : mem_wb_reg.alu_data);
+
+    forwarding inst_forwarding(
+        .id_ex_reg(id_ex_reg),
+        .ex_mem_reg(ex_mem_reg),
+        .mem_wb_reg(mem_wb_reg),
+        .forward_A(forward_A),
+        .forward_B(forward_B)
+    );
+    
+    // load_use_hazard detection
+    logic stall_control;
+    always_comb begin
+        stall_control = 1'b0; 
+        
+        if (id_ex_reg.control.mem_read && (id_ex_reg.reg_rd_id != 0)) begin
+            if ((id_ex_reg.reg_rd_id == if_id_reg.instruction.rs1) || 
+                (id_ex_reg.reg_rd_id == if_id_reg.instruction.rs2)) begin
+                stall_control = 1'b1; 
+            end
+        end
+    end
+    
 endmodule

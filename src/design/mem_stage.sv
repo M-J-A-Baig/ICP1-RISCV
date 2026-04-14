@@ -23,7 +23,7 @@ module mem_stage(
         mem_byte_enable = 4'b0000;
         
         if (control_in.mem_write) begin//write/store
-            if (control_in.mem_type == 2'b01) begin // SH
+            if (control_in.funct3 == 3'b001) begin // SH
                     mem_byte_enable = 4'b0011;                  
             end else begin //  SW 
                 mem_byte_enable = 4'b1111;
@@ -43,7 +43,7 @@ module mem_stage(
     always_comb begin        
         memory_data_out = raw_read_data; //LW
         if (control_in.mem_read) begin
-            if (control_in.extend_type == 1'b0) begin // LBU 
+            if (control_in.funct3 == 3'b100) begin // LBU 
                 case (offset)
                     2'b00: memory_data_out = {24'b0, raw_read_data[7:0]};
                     2'b01: memory_data_out = {24'b0, raw_read_data[15:8]};
