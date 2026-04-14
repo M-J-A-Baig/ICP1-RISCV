@@ -1,42 +1,35 @@
 name: sv_CI
-
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
   sv-test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # ---------------------------
-      # Install tools
-      # ---------------------------
       - name: Install tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y verilator iverilog
+          sudo apt-get install -y verilator
 
-      # ---------------------------
-      # Lint with Verilator
-      # ---------------------------
-#      - name: Lint SystemVerilog
+#      - name: Debug
 #        run: |
-#          verilator --lint-only -Wall src/design/common.sv src/design/alu.sv src/design/*.sv 
-
-      # ---------------------------
-      # Compile with Icarus Verilog
-      # ---------------------------
+#          echo "=== common.sv ==="
+#          cat src/design/common.sv
+#          echo "=== cpu.sv ==="
+#          cat src/design/cpu.sv
+#W          
+#     - name: Check verilator version
+#        run: verilator --version
+        
       - name: Compile testbench
         run: |
-         iverilog -g2012 -I src/design -s cpu -o sim.out src/design/*.sv src/simulation/testbench.sv
+          mkdir -p obj_dir
+          verilator --binary -sv -Wno-fatal --top-module testbench src/design/common.sv src/design/alu.sv src/design/control.sv src/design/data_memory.sv src/design/program_memory.sv src/design/register_file.sv src/design/fetch_stage.sv src/design/decode_stage.sv src/design/execute_stage.sv src/design/mem_stage.sv src/design/uart.sv src/design/cpu.sv src/simulation/testbench.sv -o simulate
+          echo "=== files in root ==="
+          ls -la
+          echo "=== files in obj_dir ==="
+          ls -la obj_dir/
 
-      # ---------------------------
-      # Run simulation
-      # ---------------------------
       - name: Run simulation
-        run: |
-          vvp sim.out
+        run: cd src/design && ../../obj_dir/simulate
