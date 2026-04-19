@@ -8,7 +8,7 @@ module uart_data(
     output logic finish
 );
     		
-	parameter MSB_FIRST = 1;	
+	parameter MSB_FIRST = 1;	//
 	parameter TIME_OUT = 100000;//个时钟周期  公式：(FREQUENCY_IN_HZ / BAUD) *设定的传多少bit算超时
 	logic [31 : 0]data_next;
     logic [31 : 0]program_mem_write_address_next;
