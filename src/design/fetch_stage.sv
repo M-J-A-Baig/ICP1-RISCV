@@ -4,6 +4,7 @@
 module fetch_stage(
     input clk,
     input reset_n,
+    input uart_finish,
     input logic branch_taken,
     input logic [31:0] branch_target,
     output logic [31:0] address,
@@ -24,12 +25,17 @@ module fetch_stage(
         
         
     always_comb begin
-        if (branch_taken) begin
-        pc_next = branch_target;
+        if (uart_finish) begin
+            if (branch_taken) begin
+                pc_next = branch_target;
+            end
+            else begin
+                pc_next = pc_reg + 4;
+            end
         end
         else begin
-        pc_next = pc_reg + 4;
-        end      
+               pc_next = 0;
+             end       
     end
     
     

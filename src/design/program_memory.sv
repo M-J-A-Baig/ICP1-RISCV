@@ -16,9 +16,9 @@ module program_memory (
     assign word_address = byte_address[9:2];    
     
     
-    initial begin
+   /* initial begin
         $readmemb("instruction_mem.mem", ram);
-    end
+    end */
     
     
     always @(posedge clk) begin
@@ -27,6 +27,6 @@ module program_memory (
         end 
     end
     
-    assign read_data = ram[word_address];
+    assign read_data = ram[word_address];////
 
 endmodule
