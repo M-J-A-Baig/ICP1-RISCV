@@ -47,8 +47,8 @@ module execute_stage(
       .result(alu_data)
     );
   
-   
-  assign control_in.jump_id  =  (({ instruction_in.funct3, instruction_in.opcode} == { 3'b000, 7'b1100011}) &&  zero_flag 			  )  ?   1'b1 : //beq
+   assign control_out = control_in;
+   assign control_out.jump_id  =  (({ instruction_in.funct3, instruction_in.opcode} == { 3'b000, 7'b1100011}) &&  zero_flag 			  )  ?   1'b1 : //beq
     							(({ instruction_in.funct3, instruction_in.opcode} == { 3'b001, 7'b1100011}) && !zero_flag 			  )  ?   1'b1 : // bne
     							(({ instruction_in.funct3, instruction_in.opcode} == { 3'b100, 7'b1100011}) && $signed(alu_data) < 0  )  ?   1'b1 : // blt
     							(({ instruction_in.funct3, instruction_in.opcode} == { 3'b110, 7'b1100011}) && alu_data < 0           )  ?   1'b1 : // bltU
@@ -61,7 +61,7 @@ module execute_stage(
   
 
    // assign alu_data = ( control_in.encoding == I_TYPE && control_in.mem_read  && control_in.mem_to_reg ) ?  { {24{wire_bw_output_ALUresult[7]}}, wire_bw_output_ALUresult[7:0] } : wire_bw_output_ALUresult;
-    assign control_out = control_in;
+    
     assign memory_data = data2;
     
 endmodule

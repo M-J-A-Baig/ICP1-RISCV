@@ -80,7 +80,7 @@ module cpu(
     fetch_stage inst_fetch_stage(                  //simple program counter
         .clk(clk), 
         .reset_n(reset_n),
-        .control_in(id_ex_reg.control),
+        .control_in(ex_mem_reg.control),
       	.offset_data(id_ex_reg.immediate_data),
         .address(program_mem_address),
         .data(program_mem_read_data)     
