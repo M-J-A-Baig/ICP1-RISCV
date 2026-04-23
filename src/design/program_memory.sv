@@ -16,9 +16,17 @@ module program_memory (
     assign word_address = byte_address[9:2];    
     
     
-    initial begin
-        $readmemb("instruction_mem.mem", ram);
-    end
+   // initial begin
+   //     $readmemb("instruction_mem.mem", ram);
+   // end
+  
+  integer i;
+	initial begin
+    	for (i = 0; i < 256; i = i + 1)
+       		 ram[i] = 32'b0;
+
+    	$readmemb("instruction_mem.mem", ram);
+		end
     
     
     always @(posedge clk) begin

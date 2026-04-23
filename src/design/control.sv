@@ -9,12 +9,37 @@ module control(
     output control_type control
 );
 
-    localparam logic [16:0] ADD_INSTRUCTION = {7'b0000000, 3'b000, 7'b0110011};
-    localparam logic [16:0] SUB_INSTRUCTION = {7'b0100000, 3'b000, 7'b0110011};
-    localparam logic [9:0] ADDI_INSTRUCTION = {3'b000, 7'b0010011};
-    localparam logic [9:0] LW_INSTRUCTION = {3'b010, 7'b0000011};
-    localparam logic [9:0] SW_INSTRUCTION = {3'b010, 7'b0100011};
-    localparam logic [9:0] BEQ_INSTRUCTION = {3'b000, 7'b1100011};
+  localparam logic [9:0] ADD_INSTRUCTION =  {7'b0000000, 3'b000};
+  localparam logic [9:0] ADDI_INSTRUCTION = {7'b0000000, 3'b000};
+  localparam logic [9:0] SUB_INSTRUCTION =  {7'b0100000, 3'b000};
+  
+  localparam logic [9:0] SRL_INSTRUCTION =  {7'b0000000, 3'b101};
+  localparam logic [9:0] SRA_INSTRUCTION =  {7'b0100000, 3'b101};
+  localparam logic [9:0] SRAI_INSTRUCTION = {7'b0100000, 3'b101};
+  
+  localparam logic [9:0] AND_INSTRUCTION = {7'b0000000, 3'b111};
+  localparam logic [2:0] ANDI_INSTRUCTION = {3'b111};
+  localparam logic [9:0] XOR_INSTRUCTION = {7'b0000000, 3'b100};
+  localparam logic [2:0] XORI_INSTRUCTION = {3'b100};
+  localparam logic [9:0] OR_INSTRUCTION = {7'b0000000, 3'b110};
+  localparam logic [2:0] ORI_INSTRUCTION = {3'b110};
+  
+  localparam logic [9:0] SLT_INSTRUCTION = {7'b0000000, 3'b010};
+  localparam logic [2:0] SLTI_INSTRUCTION = {3'b010};
+  localparam logic [9:0] SLTU_INSTRUCTION = {7'b0000000, 3'b011};
+  localparam logic [2:0] SLTUI_INSTRUCTION = {3'b011};
+  
+  
+  localparam logic [9:0] LB_INSTRUCTION = {3'b000, 7'b0000011};
+  localparam logic [9:0] LBU_INSTRUCTION = {3'b100, 7'b0000011};
+  localparam logic [9:0] LH_INSTRUCTION = {3'b001, 7'b0000011};
+  localparam logic [9:0] LHU_INSTRUCTION = {3'b101, 7'b0000011};
+
+
+//     localparam logic [9:0] LW_INSTRUCTION = {3'b010, 7'b0000011};
+//     localparam logic [9:0] SW_INSTRUCTION = {3'b010, 7'b0100011};
+//     localparam logic [9:0] BEQ_INSTRUCTION = {3'b000, 7'b1100011};
+  
 
     // // green commands - grade 3
     // localparam logic [16:0] SLL_INSTRUCTION     = {7'b0000000, 3'b001, 7'b0110011};
@@ -109,16 +134,104 @@ module control(
             end
         endcase
         
-        control.alu_op = ALU_ADD;
-        if ({instruction.funct7, instruction.funct3, instruction.opcode} == ADD_INSTRUCTION) begin
-            control.alu_op = ALU_ADD;
-        end 
-        else if ({instruction.funct7, instruction.funct3, instruction.opcode} == SUB_INSTRUCTION) begin
-            control.alu_op = ALU_SUB;
-        end 
-        else if ({instruction.funct3, instruction.opcode} == BEQ_INSTRUCTION) begin
-            control.alu_op = ALU_SUB;
-        end            
+        
+       control.alu_op = ALU_ADD;
+      
+      //control.alu_op = ALU_ADD;
+     case (instruction.opcode)
+
+            7'b0110011: begin // R-type
+                 if ({instruction.funct7, instruction.funct3} == ADD_INSTRUCTION) begin
+                  control.alu_op = ALU_ADD;
+                    end 
+                else if ({instruction.funct7, instruction.funct3} == SUB_INSTRUCTION) begin
+                        control.alu_op = ALU_ADD;
+                    end 
+                else if ({instruction.funct7, instruction.funct3} == SRL_INSTRUCTION) begin
+                        control.alu_op = ALU_SRL;
+                    end
+               else if ({instruction.funct7, instruction.funct3} == SRA_INSTRUCTION) begin
+                        control.alu_op = ALU_SRA;
+                    end
+              else if ({instruction.funct7, instruction.funct3} == XOR_INSTRUCTION) begin
+                        control.alu_op = ALU_XOR;
+                    end
+              else if ({instruction.funct7, instruction.funct3} == OR_INSTRUCTION) begin
+                        control.alu_op = ALU_OR;
+                    end
+              else if ({instruction.funct7, instruction.funct3} == AND_INSTRUCTION) begin
+                        control.alu_op = ALU_AND;
+                    end
+               else if ({instruction.funct7, instruction.funct3} == SLT_INSTRUCTION) begin
+                        control.alu_op = ALU_SLT;
+                    end
+              else if ({instruction.funct7, instruction.funct3} == SLTU_INSTRUCTION) begin
+                        control.alu_op = ALU_SLT;
+                    end
+              
+              
+              
+                else 
+                  control.alu_op = ALU_ADD;
+            end
+
+            7'b0010011: begin // I-type ALU
+                 if ({instruction.funct7, instruction.funct3} == ADDI_INSTRUCTION) begin
+                        control.alu_op = ALU_ADD;
+                    end 
+                 else if ({instruction.funct7, instruction.funct3} == SRAI_INSTRUCTION) begin
+                        control.alu_op = ALU_SRA;
+                    end 
+                 else if ({instruction.funct3} == XORI_INSTRUCTION) begin
+                        control.alu_op = ALU_XOR;
+                    end
+              	 else if ({instruction.funct3} == ANDI_INSTRUCTION) begin
+                        control.alu_op = ALU_AND;
+                    end
+              	 else if ({instruction.funct3} == ORI_INSTRUCTION) begin
+                        control.alu_op = ALU_OR;
+                    end
+                 else if ({instruction.funct3} == SLTI_INSTRUCTION) begin
+                        control.alu_op = ALU_SLT;
+                    end
+                else if ({instruction.funct3} == SLTUI_INSTRUCTION) begin
+                        control.alu_op = ALU_SLT;
+                    end
+              
+                   
+              
+                else 
+                  control.alu_op = ALU_ADD;
+              
+               end
+            
+            7'b0000011: begin
+              if ({instruction.funct3, instruction.opcode} == LB_INSTRUCTION) begin
+                        control.alu_op = ALU_ADD;
+                    end 
+              else if ({instruction.funct3, instruction.opcode} == LBU_INSTRUCTION) begin
+                        control.alu_op = ALU_ADD;
+                    end 
+              else if ({instruction.funct3, instruction.opcode} == LHU_INSTRUCTION) begin
+                        control.alu_op = ALU_ADD;
+                    end 
+              else if ({instruction.funct3, instruction.opcode} == LH_INSTRUCTION) begin
+                        control.alu_op = ALU_ADD;
+                    end 
+              
+              
+                   
+              
+                else 
+                  control.alu_op = ALU_ADD;
+            end
+
+      endcase
+      
+      
+      
+      
+      
     end
     
 endmodule

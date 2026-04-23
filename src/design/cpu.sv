@@ -8,7 +8,7 @@ module cpu(
     input reset_n
 );
 
-    logic [31:0] program_mem_address = 0;
+    logic [31:0] program_mem_address ;
     logic program_mem_write_enable = 0;         
     logic [31:0] program_mem_write_data = 0; 
     logic [31:0] program_mem_read_data;
@@ -53,12 +53,13 @@ module cpu(
             id_ex_reg.data2 <= decode_data2;
             id_ex_reg.immediate_data <= decode_immediate_data;
             id_ex_reg.control <= decode_control;
+            id_ex_reg.instruction <= if_id_reg.instruction;
             
             ex_mem_reg.reg_rd_id <= id_ex_reg.reg_rd_id;
             ex_mem_reg.control <= execute_control;
             ex_mem_reg.alu_data <= execute_alu_data;
             ex_mem_reg.memory_data <= execute_memory_data;
-            
+          	ex_mem_reg.instruction <= if_id_reg.instruction;
             mem_wb_reg.reg_rd_id <= ex_mem_reg.reg_rd_id;
             mem_wb_reg.memory_data <= memory_memory_data;
             mem_wb_reg.alu_data <= memory_alu_data;
@@ -79,6 +80,8 @@ module cpu(
     fetch_stage inst_fetch_stage(                  //simple program counter
         .clk(clk), 
         .reset_n(reset_n),
+        .control_in(id_ex_reg.control),
+      	.offset_data(id_ex_reg.immediate_data),
         .address(program_mem_address),
         .data(program_mem_read_data)     
     );
@@ -107,6 +110,7 @@ module cpu(
         .data2(id_ex_reg.data2),
         .immediate_data(id_ex_reg.immediate_data),
         .control_in(id_ex_reg.control),
+        .instruction_in(id_ex_reg.instruction),
         .control_out(execute_control),
         .alu_data(execute_alu_data),
         .memory_data(execute_memory_data)          
@@ -117,6 +121,7 @@ module cpu(
         .clk(clk), 
         .reset_n(reset_n),
         .alu_data_in(ex_mem_reg.alu_data),
+        .intruction_in(ex_mem_reg.instruction),
         .memory_data_in(ex_mem_reg.memory_data),
         .control_in(ex_mem_reg.control),
         .control_out(memory_control),

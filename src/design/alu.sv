@@ -13,10 +13,17 @@ module alu(
 
     always_comb begin
         case (control)
-            ALU_AND: result = left_operand & right_operand;
-            ALU_OR: result = left_operand | right_operand;
-            ALU_ADD: result = left_operand + right_operand;
-            ALU_SUB: result = left_operand - right_operand;
+          
+            ALU_AND  : result = left_operand & right_operand;
+            ALU_OR   : result = left_operand | right_operand;
+            ALU_ADD  : result = left_operand + right_operand;
+            //ALU_SUB  : result = left_operand - right_operand;
+            ALU_SRL  : result = left_operand >> right_operand;
+            ALU_SRA  : result = $signed(left_operand) >>> right_operand[4:0];
+            ALU_XOR  : result = left_operand ^ right_operand;
+            ALU_SLT  : result = (left_operand < right_operand)? 1 : 0 ; //signs handeled in decode and execute
+           
+          
 
 
             // ALU_SRL :  result = left_operand >> right_operand[4:0]; // shiift only lower 5 bit value
@@ -29,11 +36,11 @@ module alu(
 
 
 
-            default: result = left_operand + right_operand;
+            default: result = result ;//left_operand + right_operand;
         endcase
     end
     
     
-    assign zero_flag = 1'b1 ? result == 0 : 1'b0;
+    assign zero_flag = result == 0 ?  1'b1 : 1'b0;
 
 endmodule

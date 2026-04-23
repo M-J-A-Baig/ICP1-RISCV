@@ -2,10 +2,25 @@ package common;
 
     typedef enum logic [2:0] 
     {
-        ALU_AND = 3'b000,
-        ALU_OR = 3'b001,
-        ALU_ADD = 3'b010,
-        ALU_SUB = 3'b011
+        ALU_ADD = 3'b000, //sub
+        ALU_SLL = 3'b001,
+      	ALU_SLT	= 3'b010,
+      	ALU_SRA	= 3'b011,
+        ALU_XOR = 3'b100,
+        ALU_SRL = 3'b101,
+        ALU_OR =  3'b110,
+        ALU_AND = 3'b111
+       // ALU_SRA = 3'b001,
+        
+      
+      
+//       ALU_AND = 3'b000,
+//       ALU_OR =  3'b110,
+//         ALU_ADD = 3'b010,
+//       	ALU_XOR = 3'b100,
+//         ALU_SRL = 3'b101,
+//         ALU_SRA = 3'b001,
+      	
 
         // // Basic ALU ops
         // ALU_AND       = 6'b000000,
@@ -92,6 +107,7 @@ package common;
         logic reg_write;
         logic mem_to_reg;
         logic is_branch;
+      logic [1:0] jump_id; // 00 default, 01 jumpallowed
     } control_type;
     
     
@@ -120,15 +136,17 @@ package common;
         logic [31:0] data2;
         logic [31:0] immediate_data;
         control_type control;
+        instruction_type instruction;
     } id_ex_type;
     
 
-    typedef struct packed
+    typedef struct packed	
     {
         logic [5:0] reg_rd_id;
         control_type control;
         logic [31:0] alu_data;
         logic [31:0] memory_data;
+      	instruction_type instruction;
     } ex_mem_type;
     
     
@@ -143,7 +161,7 @@ package common;
 
     function [31:0] immediate_extension(instruction_type instruction, encoding_type inst_encoding);
         case (inst_encoding)
-            I_TYPE: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rs2} };
+          I_TYPE: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rs2} };
             S_TYPE: immediate_extension = { {20{instruction.funct7[6]}}, {instruction.funct7, instruction.rd} };
             B_TYPE: immediate_extension = 
                 { {20{instruction.funct7[6]}}, {instruction.funct7[6], instruction.rd[0], instruction.funct7[5:0], instruction.rd[4:1]} };
