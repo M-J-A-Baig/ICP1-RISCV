@@ -20,21 +20,36 @@ module execute_stage(
     
     logic [31:0] left_operand;
     logic [31:0] right_operand;
-    //logic [31:0] wire_bw_output_ALUresult;
     
+    logic [31:0] wire_bw_data1_left_operand;
+    logic [31:0] wire_bw_data2_right_operand;
+    
+    
+    //logic [31:0] wire_bw_output_ALUresult;
+
     
     always_comb begin: operand_selector
-        left_operand = data1;
-        right_operand = data2;
-        if (control_in.alu_src) begin
-            right_operand = immediate_data;
-        end
+       // left_operand = data1;
+       left_operand  = ({instruction_in.funct7, instruction_in.funct3, instruction_in.opcode} == {7'b0000000, 3'b010, 7'b0110011}) ? $signed(data1) : //slt
+      					 																									data1;
        
-      if (control_in.alu_op == ALU_SRL)
-        right_operand = {{27{1'b0}}, data2[4:0]};
+       right_operand =  ({instruction_in.funct7, instruction_in.funct3, instruction_in.opcode}  == {7'b0100000, 3'b000, 7'b0110011})   ?   -$signed(data2)        :          //sub
+                        ({instruction_in.funct7, instruction_in.funct3, instruction_in.opcode}  == {7'b0000000, 3'b101,  7'b0110011})  ?  {{27{1'b0}}, data2[4:0]}:          //srl
+   						({instruction_in.funct7, instruction_in.funct3, instruction_in.opcode}  == {7'b0000000, 3'b010, 7'b0110011})   ?   $signed(data2)         :          //slt
+                        ({ instruction_in.funct3, instruction_in.opcode}                        == { 3'b000, 7'b1100011})              ?  -$signed(data2)         :          //beq
+     					({ instruction_in.funct3, instruction_in.opcode}                        == { 3'b001, 7'b1100011})              ?  -$signed(data2)         :          //bne
+      					({ instruction_in.funct3, instruction_in.opcode}                        == { 3'b100, 7'b1100011})              ?  -$signed(data2)         :          //blt
+                        ({ instruction_in.funct3, instruction_in.opcode}                        == { 3'b110, 7'b1100011})              ?  (data2)                 :          //bltU
+                        ({ instruction_in.funct3, instruction_in.opcode}                        == { 3'b101, 7'b1100011})              ?  -$signed(data2)         :          //bge
+      					({ instruction_in.funct3, instruction_in.opcode}                        == { 3'b111, 7'b1100011})              ?  (data2)                 :          //bgeU
+     					 																									               data2                  ;
+     					 																									               
+        if (control_in.alu_src) begin
+           // right_operand = immediate_data;
+            right_operand = ({instruction_in.funct7, instruction_in.funct3, instruction_in.opcode} == {7'b0000000, 3'b010, 7'b0110011}) ?  $signed(immediate_data):  //stli
+      																						                                                immediate_data; 
+            end
      
-          
-      
     end
     
     
@@ -48,7 +63,7 @@ module execute_stage(
     );
   
    assign control_out = control_in;
-   assign control_out.jump_id  =  (({ instruction_in.funct3, instruction_in.opcode} == { 3'b000, 7'b1100011}) &&  zero_flag 			  )  ?   1'b1 : //beq
+   assign control_out.jump_id  =  (({ instruction_in.funct3, instruction_in.opcode} == { 3'b000, 7'b1100011}) &&  zero_flag 	      )  ?   1'b1 : //beq
     							(({ instruction_in.funct3, instruction_in.opcode} == { 3'b001, 7'b1100011}) && !zero_flag 			  )  ?   1'b1 : // bne
     							(({ instruction_in.funct3, instruction_in.opcode} == { 3'b100, 7'b1100011}) && $signed(alu_data) < 0  )  ?   1'b1 : // blt
     							(({ instruction_in.funct3, instruction_in.opcode} == { 3'b110, 7'b1100011}) && alu_data < 0           )  ?   1'b1 : // bltU

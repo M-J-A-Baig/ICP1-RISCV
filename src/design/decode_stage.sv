@@ -52,21 +52,25 @@ module decode_stage(
     assign reg_rd_id = instruction.rd;
     assign control_signals = controls;
   
-    assign immediate_data = ({instruction.funct7, instruction.funct3, instruction.opcode} == {7'b0000000, 3'b010, 7'b0110011}) ?  $signed(immediate_extension(instruction, controls.encoding)):  //stli
-      																						                                      immediate_extension(instruction, controls.encoding);
+    //assign immediate_data = ({instruction.funct7, instruction.funct3, instruction.opcode} == {7'b0000000, 3'b010, 7'b0110011}) ?  $signed(immediate_extension(instruction, controls.encoding)):  //stli
+    //  																						                                      immediate_extension(instruction, controls.encoding);
  
-    assign read_data1 = ({instruction.funct7, instruction.funct3, instruction.opcode} == {7'b0000000, 3'b010, 7'b0110011}) ? $signed(rf_read_data1) : //slt
-     					 																									  rf_read_data1;
-  
-  	assign read_data2 = ({instruction.funct7, instruction.funct3, instruction.opcode} == {7'b0100000, 3'b000, 7'b0110011}) ? -$signed(rf_read_data2) : //sub
-   						({instruction.funct7, instruction.funct3, instruction.opcode} == {7'b0000000, 3'b010, 7'b0110011}) ? $signed(rf_read_data2) : //slt
-                        ({ instruction.funct3, instruction.opcode}                    == { 3'b000, 7'b1100011})            ? -$signed(rf_read_data2) : //beq
-     					({ instruction.funct3, instruction.opcode}                    == { 3'b001, 7'b1100011})            ? -$signed(rf_read_data2) : //bne
-      					({ instruction.funct3, instruction.opcode}                    == { 3'b100, 7'b1100011})            ? -$signed(rf_read_data2) : //blt
-                        ({ instruction.funct3, instruction.opcode}                    == { 3'b110, 7'b1100011})            ? (rf_read_data2) : //bltU
-                        ({ instruction.funct3, instruction.opcode}                    == { 3'b101, 7'b1100011})            ? -$signed(rf_read_data2) : //bge
-      					({ instruction.funct3, instruction.opcode}                    == { 3'b111, 7'b1100011})            ? (rf_read_data2) : //bgeU
-     					 																									  rf_read_data2;
+   // assign read_data1 = ({instruction.funct7, instruction.funct3, instruction.opcode} == {7'b0000000, 3'b010, 7'b0110011}) ? $signed(rf_read_data1) : //slt
+   //  					 																									  rf_read_data1;
+   
+    assign immediate_data =  immediate_extension(instruction, controls.encoding);
+    assign read_data1 = rf_read_data1;
+    assign read_data2 =  rf_read_data2;
+//  	assign read_data2 = ({instruction.funct7, instruction.funct3, instruction.opcode} == {7'b0100000, 3'b000, 7'b0110011}) ? -$signed(rf_read_data2) : //sub
+//   						({instruction.funct7, instruction.funct3, instruction.opcode} == {7'b0000000, 3'b010, 7'b0110011}) ? $signed(rf_read_data2) : //slt
+//                        ({ instruction.funct3, instruction.opcode}                    == { 3'b000, 7'b1100011})            ? -$signed(rf_read_data2) : //beq
+//     					({ instruction.funct3, instruction.opcode}                    == { 3'b001, 7'b1100011})            ? -$signed(rf_read_data2) : //bne
+//      					({ instruction.funct3, instruction.opcode}                    == { 3'b100, 7'b1100011})            ? -$signed(rf_read_data2) : //blt
+//                        ({ instruction.funct3, instruction.opcode}                    == { 3'b110, 7'b1100011})            ? (rf_read_data2) : //bltU
+//                        ({ instruction.funct3, instruction.opcode}                    == { 3'b101, 7'b1100011})            ? -$signed(rf_read_data2) : //bge
+//      					({ instruction.funct3, instruction.opcode}                    == { 3'b111, 7'b1100011})            ? (rf_read_data2) : //bgeU
+//     					 																									  rf_read_data2;
+
     
 endmodule
     
