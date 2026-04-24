@@ -5,14 +5,22 @@ import common::*;
 
 module cpu(
     input clk,
-    input reset_n
+    input reset_n,
+    input io_rx
 );
 
-    logic [31:0] program_mem_address = 0;
-    logic program_mem_write_enable = 0;         
-    logic [31:0] program_mem_write_data = 0; 
+    logic [31:0] program_mem_address ;
+    logic program_mem_write_enable ;   
+    logic [31:0] program_mem_write_data;       
+    //logic [31:0] program_mem_write_data = 0; 
+    //logic [31:0] program_mem_address = 0;
+    //logic program_mem_write_enable = 0;  
     logic [31:0] program_mem_read_data;
-    
+    logic [31:0] program_mem_write_address;
+    logic [31:0] program_mem_read_address;
+    logic cpu_reset_n;
+    logic uart_finish;
+
     logic [5:0] decode_reg_rd_id;
     logic [31:0] decode_data1;
     logic [31:0] decode_data2;
@@ -39,7 +47,7 @@ module cpu(
     
     logic [1:0] forward_A;
     logic [1:0] forward_B;//forwarding unit
-    
+    logic stall_control;
    
     always_ff @(posedge clk) begin
         if (!reset_n) begin
@@ -86,6 +94,15 @@ module cpu(
         end
     end
 
+    uart_data uart_data(
+        .clk(clk),
+        .reset_n(reset_n),
+        .io_rx(io_rx),
+        .io_data_valid(program_mem_write_enable),
+        .data(program_mem_write_data),
+        .program_mem_write_address(program_mem_write_address),
+        .finish(uart_finish)          
+    );
 
     program_memory inst_mem(
         .clk(clk),        
@@ -98,8 +115,8 @@ module cpu(
     
     fetch_stage inst_fetch_stage(
         .clk(clk), 
-        .reset_n(reset_n),
-        .address(program_mem_address),
+        .reset_n(cpu_reset_n),
+        .address(program_mem_read_address),
         .data(program_mem_read_data),
         .jump_en(execute_control.is_jump),
         .jump_target(execute_jump_target),
@@ -111,7 +128,7 @@ module cpu(
     
     decode_stage inst_decode_stage(
         .clk(clk), 
-        .reset_n(reset_n),    
+        .reset_n(cpu_reset_n),    
         .instruction(if_id_reg.instruction),
         .pc(if_id_reg.pc),
         .write_en(wb_write_back_en),
@@ -127,7 +144,7 @@ module cpu(
     
     execute_stage inst_execute_stage(
         .clk(clk), 
-        .reset_n(reset_n),
+        .reset_n(cpu_reset_n),
         .pc(id_ex_reg.pc),
         .data1(id_ex_reg.data1),
         .data2(id_ex_reg.data2),
@@ -146,7 +163,7 @@ module cpu(
     
     mem_stage inst_mem_stage(
         .clk(clk), 
-        .reset_n(reset_n),
+        .reset_n(cpu_reset_n),
         .alu_data_in(ex_mem_reg.alu_data),
         .memory_data_in(ex_mem_reg.memory_data),
         .control_in(ex_mem_reg.control),
@@ -155,7 +172,8 @@ module cpu(
         .alu_data_out(memory_alu_data)
     );
 
-
+    assign cpu_reset_n = reset_n & uart_finish;
+    assign program_mem_address = program_mem_write_enable ? program_mem_write_address : program_mem_read_address;
     assign wb_reg_rd_id = mem_wb_reg.reg_rd_id;
     assign wb_write_back_en = mem_wb_reg.control.reg_write;
     //assign wb_result = mem_wb_reg.control.mem_read ? mem_wb_reg.memory_data : mem_wb_reg.alu_data;
@@ -170,7 +188,7 @@ module cpu(
     );
     
     // load_use_hazard detection
-    logic stall_control;
+    
     always_comb begin
         stall_control = 1'b0; 
         

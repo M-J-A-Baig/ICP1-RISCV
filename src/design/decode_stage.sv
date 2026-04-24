@@ -1,6 +1,5 @@
 `timescale 1ns / 1ps
 
-//`include "common.sv"
 import common::*;
 
 
@@ -16,6 +15,7 @@ module decode_stage(
     output logic [31:0] read_data1,
     output logic [31:0] read_data2,
     output logic [31:0] immediate_data,
+//    output logic [31:0] branch_target,
     output control_type control_signals
 );
 
@@ -47,9 +47,19 @@ module decode_stage(
     
    
     assign reg_rd_id = instruction.rd;
-    assign read_data1 = rf_read_data1;
+    //assign read_data1 = rf_read_data1;
     assign read_data2 = rf_read_data2;
     assign immediate_data = immediate_extension(instruction, controls.encoding);
     assign control_signals = controls;
     
+
+    always_comb begin
+        if (instruction.opcode == 7'b0010111) begin //AUIPC
+            read_data1 = pc;
+        end
+        else begin
+            read_data1 = rf_read_data1;
+        end
+    end
+
 endmodule

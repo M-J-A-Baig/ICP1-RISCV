@@ -88,7 +88,7 @@ module execute_stage(
                     end
                 end
                 
-                3'b110: begin // BLTU
+                default: begin // other branch instructions
                     if (alu_data == 1'b1) begin
                         control_out.is_jump = 1'b1;
                         jump_target = branch_target;
@@ -97,7 +97,14 @@ module execute_stage(
             endcase
         end
         else if(control_in.is_jump) begin
-            jump_target = alu_data & 32'hFFFFFFFE; // LSB -> 0
+            if (control_in.encoding == J_TYPE) begin
+                // JAL target : PC + offset 
+                jump_target = branch_target; 
+            end 
+            else begin
+                // JALR target: rs1 + offset 
+                jump_target = alu_data & 32'hFFFFFFFE; // LSB -> 0
+            end
         end
     end
         

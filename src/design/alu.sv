@@ -18,12 +18,16 @@ module alu(
             ALU_ADD: result = left_operand + right_operand;
             ALU_SUB: result = left_operand - right_operand;
             
-            ALU_SLL: result = left_operand << right_operand;
+            ALU_SLL: result = left_operand << right_operand[4:0];
             ALU_SRL: result = left_operand >> right_operand; // the same as ALU_SRLI
             ALU_LUI: result = right_operand;
             ALU_XOR: result = left_operand ^ right_operand;  // the same as ALU_XORI
             ALU_SLT: result = $signed(left_operand) < $signed(right_operand); // the same as ALU_SLTI(use SUB??)
             ALU_SLTU: result = $unsigned(left_operand) < $unsigned(right_operand);
+            
+            ALU_SRA: result = $signed(left_operand) >>> right_operand[4:0];
+            ALU_GEU: result = (left_operand >= right_operand) ? 32'b1 : 32'b0;
+            ALU_GE: result = ( $signed(left_operand) >=  $signed(right_operand)) ? 32'b1 : 32'b0;
             default: result = left_operand + right_operand;
         endcase
     end

@@ -8,11 +8,13 @@ package common;
         ALU_SUB = 4'b0011,
         ALU_SLL = 4'b0100, //4
         ALU_SRL = 4'b0101, //5
-        ALU_LUI = 4'b0111, //7
-        ALU_XOR = 4'b1001, //9
-        //ALU_AND = 4'b1011, //11
-        ALU_SLT = 4'b1010, //10
-        ALU_SLTU = 4'b1011
+        ALU_LUI = 4'b0110, //6
+        ALU_XOR = 4'b0111, //7
+        ALU_SLT = 4'b1000, //8
+        ALU_SLTU = 4'b1001,//9
+        ALU_SRA = 4'b1010,//10
+        ALU_GEU = 4'b1011,//11
+        ALU_GE = 4'b1100 //12
     } alu_op_type;
     
     
