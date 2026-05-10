@@ -11,51 +11,120 @@ module mem_stage(
     output logic [31:0] memory_data_out,
     output logic [31:0] alu_data_out
 );
-    logic [7:0]  memory_byte;
+
+    logic [3:0] mem_byte_enable;
+    logic [31:0] raw_read_data;
+
+    logic [1:0] offset;// to choose which bytes
+    logic [7:0] memory_byte;// different bytes in one address
     logic [15:0] memory_halfword;
-    logic [31:0] memory_data;
+
+    logic [31:0] write_data;
+    assign offset = alu_data_in[1:0]; // byte offset
+
+//--------link---------
     data_memory inst_mem(
-        .clk(clk),        
-        .byte_address(alu_data_out),
-        .write_enable(control_in.mem_write),
-        .write_data(memory_data_in),
-        .read_data(memory_data)
+    .clk(clk),        
+    .byte_address(alu_data_out),
+    .write_byte_enable(mem_byte_enable),  
+    .write_data(write_data),
+    .read_data(raw_read_data)
     );
     
-    assign alu_data_out = alu_data_in;    
-    assign control_out = control_in;
-    
+//-----------WRITE---------------
     always_comb begin
-    memory_data_out = memory_data;
-        // 1. 字节提取 (基于内存地址的最低两位 alu_result[1:0])
-        // 因为 RISC-V 是小端序 (Little-Endian)，地址 0 对应最低字节
-        case (alu_data_in[1:0])
-            2'b00: memory_byte = memory_data[7:0];
-            2'b01: memory_byte = memory_data[15:8];
-            2'b10: memory_byte = memory_data[23:16];
-            2'b11: memory_byte = memory_data[31:24];
-        endcase
+        mem_byte_enable = 4'b0000;
+        write_data = memory_data_in;
+
+        if (control_in.mem_write) begin  //write-store
+            if (control_in.funct3 == 3'b001) begin // SH
+                case (offset[1])
+                    1'b0: begin
+                                mem_byte_enable = 4'b0011;
+                                write_data = {16'b0, memory_data_in[15:0]};
+                            end
+                    1'b1: begin
+                                mem_byte_enable = 4'b1100;
+                                write_data = {memory_data_in[15:0], 16'b0};
+                            end
+                    default:begin
+                        mem_byte_enable = 4'b0011;
+                        write_data = {16'b0, memory_data_in[15:0]};
+                    end
+                endcase
+                mem_byte_enable = 4'b0011;                  
+            end 
+            else if (control_in.funct3 == 3'b000) begin //SB
+                case (offset)
+                    2'b00:  begin
+                                mem_byte_enable = 4'b0001;
+                                write_data = {24'b0, memory_data_in[7:0]};
+                            end
+                    2'b01: begin
+                                mem_byte_enable = 4'b0010;
+                                write_data = {16'b0, memory_data_in[7:0], 8'b0};
+                            end
+                    2'b10: begin
+                                mem_byte_enable = 4'b0100;
+                                write_data = {8'b0, memory_data_in[7:0], 16'b0};
+                            end
+                    2'b11: begin
+                                mem_byte_enable = 4'b1000;
+                                write_data = {memory_data_in[7:0], 24'b0};
+                            end
+                    default:begin
+                        mem_byte_enable = 4'b0001;
+                        write_data = {24'b0, memory_data_in[7:0]};
+                    end
+                endcase
+            end
+            else begin //  SW 
+                mem_byte_enable = 4'b1111;
+            end
+        end
+    end
+
+    
+//---------READ--------------
+    always_comb begin        
+        memory_data_out = raw_read_data; //LW
         
-        case (alu_data_in[1])
-            1'b0: memory_halfword = memory_data[15:0];
-            1'b1: memory_halfword = memory_data[31:16];
+        // determine which byte
+        case (offset)
+            2'b00: memory_byte = raw_read_data[7:0];
+            2'b01: memory_byte = raw_read_data[15:8];
+            2'b10: memory_byte = raw_read_data[23:16];
+            2'b11: memory_byte = raw_read_data[31:24];
+            default:begin
+                memory_byte = raw_read_data[7:0];
+            end
         endcase
-        
+
+        // determine which half
+        case (offset[1])
+            1'b0: memory_halfword = raw_read_data[15:0];
+            1'b1: memory_halfword = raw_read_data[31:16];
+            default:begin
+                memory_halfword = raw_read_data[15:0];
+            end
+        endcase
+  
+        //different load type
         case (control_in.funct3)
-            3'b000: // LB: 提取字节，并进行 24 位符号扩展
+            3'b000: // LB
                 memory_data_out = { {24{memory_byte[7]}}, memory_byte };
-                
-            3'b100: // LBU (Load Byte Unsigned): 提取字节，高位无脑补 0 (顺手把 LBU 也做了！)
+            3'b001: // LH
+                memory_data_out = { {16{memory_byte[15]}}, memory_halfword };
+            3'b100: // LBU 
                 memory_data_out = { 24'b0, memory_byte };
-                
-            3'b010: // LW: 直接使用完整的 32 位内存数据
-                memory_data_out = memory_data;
-                
-            3'b101: // LHU (你的目标): 提取半字，16位无脑补 0
-                memory_data_out = { 16'b0, memory_halfword };                
-            // 如果以后要实现 LH (半字) 和 LHU (无符号半字)，也是在这里加分支！
+            3'b101: // LHU 
+                memory_data_out = { 16'b0, memory_halfword };
+            default:
+               memory_data_out = raw_read_data; //LW
         endcase
     end
 
+    assign alu_data_out = alu_data_in;    
+    assign control_out = control_in;
     
 endmodule

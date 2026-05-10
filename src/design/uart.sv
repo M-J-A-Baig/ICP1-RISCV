@@ -91,6 +91,14 @@ module uart(
                     uart_counter_next = 0; 
                     data_valid_next = 1;         
                 end 
+            end
+            default:
+            begin
+                uart_state_next = uart_state;
+                uart_counter_next = uart_counter_reg;
+                data_packet_next = data_packet_reg;
+                data_bit_count_next = data_bit_count_reg;
+                data_valid_next = 0;
             end                             
         endcase
     end
