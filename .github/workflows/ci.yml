@@ -25,7 +25,7 @@ jobs:
       - name: Compile testbench
         run: |
           mkdir -p obj_dir
-          verilator --binary -sv -Wno-fatal --top-module testbench src/design/common.sv src/design/alu.sv src/design/mdu.sv src/design/control.sv src/design/data_memory.sv src/design/program_memory.sv src/design/register_file.sv src/design/fetch_stage.sv src/design/decode_stage.sv src/design/execute_stage.sv src/design/mem_stage.sv src/design/uart.sv src/design/uart_data.sv src/design/cpu.sv src/simulation/testbench.sv -o simulate
+          verilator --binary -sv -Wno-fatal --top-module testbench src/design/common.sv src/design/alu.sv src/design/mdu.sv src/design/control.sv src/design/data_memory.sv src/design/forwarding.sv src/design/program_memory.sv src/design/register_file.sv src/design/fetch_stage.sv src/design/decode_stage.sv src/design/execute_stage.sv src/design/mem_stage.sv src/design/uart.sv src/design/uart_data.sv src/design/cpu.sv src/simulation/testbench.sv -o simulate
           echo "=== files in root ==="
           ls -la
           echo "=== files in obj_dir ==="
